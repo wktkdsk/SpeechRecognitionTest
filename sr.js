@@ -5,6 +5,7 @@ function MySpeechRecognition(lang, bContinueous, resultID, logID) {
 
     // valuables
     this.bEnableSpeechRecognition = false;
+    this.bFinal = false;
 
     // SpeechRecognition API
     window.SpeechRecognition
@@ -21,20 +22,25 @@ function MySpeechRecognition(lang, bContinueous, resultID, logID) {
     // callback functions for SpeechRecognition API
     this.speechRecognition.onresult = function(event) {
         m_self.postLog("result");
-//        console.log(event);
+        console.log(event);
         var result = event.results[0];
         if (result.isFinal) {
-            m_self.speechRecognition.stop();
-            m_self.postResult(result[0].transcript);
+            if (!m_self.bFinal) {
+                m_self.bFinal = true;
+                m_self.speechRecognition.stop();
+                m_self.postResult(result[0].transcript);
+            }
         } else {
             m_self.postInterimResult(result[0].transcript);
         }
     };
     this.speechRecognition.onstart = function(event) {
         m_self.postLog("start");
+        m_self.bFinal = false;
     };
     this.speechRecognition.onend = function(event) {
         m_self.postLog("end");
+        m_self.serialNumber += 1;
         if (m_self.bEnableSpeechRecognition) {
             m_self.speechRecognition.start();
         }
@@ -78,23 +84,24 @@ function MySpeechRecognition(lang, bContinueous, resultID, logID) {
     };
     this.postInterimResult = function(text) {
         var obj = $(resultID).children().last();
-        if (obj.hasClass('interim_text')) {
+        if (obj.hasClass("interim_text")) {
             obj.text(text);
         } else {
-            var html = '<div class="interim_text">'+text+"</div>";
+            var html = '<div class="interim_text">' + text + "</div>";
             $(resultID).append(html);
-        }            
+
+        }
         $(resultID).scrollTop($(resultID).get(0).scrollHeight);
     };
     this.postResult = function(text) {
         var obj = $(resultID).children().last();
-        if (obj.hasClass('interim_text')) {
-            obj.removeClass('interim_text');
+        if (obj.hasClass("interim_text")) {
+            obj.removeClass("interim_text");
             obj.text(text);
         } else {
-            var html = '<div>'+text+"</div>";
+            var html = '<div>' + text + "</div>";
             $(resultID).append(html);
-        }            
+        }
         $(resultID).scrollTop($(resultID).get(0).scrollHeight);
     };
     this.postLog = function(text) {
