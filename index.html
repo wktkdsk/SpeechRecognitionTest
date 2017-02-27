@@ -1,0 +1,43 @@
+<html>
+  <head>
+  <title>Speech Recognition</title>
+  <style>
+    .interim_text { opacity:0.5;text-decoration:underline; }
+  </style>
+  </head>
+  <body>
+    <h1>Speech Recognition</h1>
+    <hr>
+    
+    <button id="start">開始</button>
+    <button id="stop">終了</button>
+
+    <div id="result" style="height:8em;border:solid 1px #808080;overflow:auto"></div>
+    <div id="log" style="height:8em;border:dashed 1px #808080;overflow:auto"></div>
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="sr.js"></script>
+    <script type="text/javascript">
+    
+$(document).ready(function() {
+    var sr = new MySpeechRecognition('ja', true, '#result', '#log');
+
+    $('#start').on('click', function() {
+        $('#start').attr('disabled', 'disabled');
+        $('#stop').removeAttr('disabled');
+        sr.start();
+    });
+    
+    $('#stop').on('click', function() {
+        $('#start').removeAttr('disabled');
+        $('#stop').attr('disabled', 'disabled');
+        sr.stop();
+    });
+    
+    $('#stop').attr('disabled', 'disabled');
+});
+
+
+    </script>
+  </body>
+</html>
